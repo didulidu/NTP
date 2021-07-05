@@ -111,3 +111,20 @@ def load_tree_from_file(file_name, r):
         encoded_tree[len(encoded_tree) - 1] = last_bits
 
     return ''.join(encoded_tree)
+
+
+def save(output_file_name, r, encoded_tree, encoded):
+    """
+    save: save to file encoded tree with encoded data
+    Changes name of file, name must contain number of bits in last written byte
+    :param output_file_name: prefix of output file name, contains name of original file followed by _compressed_ (string)
+    :param r: number of bits in last written byte (int)
+    :param encoded_tree: Huffman's tree encoded to 1 and 0 (string)
+    :param encoded: encoded input text (string)
+    :return: return nothing
+    """
+    output_file_name += str(r) + ".bin"
+    write_binary(output_file_name, "wb", encoded_tree)
+    #extra 0 is for spacing tree from data
+    write_binary(output_file_name, "ab", '0')
+    write_binary(output_file_name, "ab", encoded)

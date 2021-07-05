@@ -56,6 +56,8 @@ class Node:
             self.left.generate_codes()
             self.right.generate_codes()
 
+
+
 def build_huffman_tree(string):
     """
     build_huffman_tree creates huffman tree for given string,
@@ -114,6 +116,22 @@ def decode(tree, encoded, index = 0, length = 0):
         return decode(tree.left, encoded, index + 1, length + 1)
     elif encoded[index] == '1':
         return decode(tree.right, encoded, index + 1, length + 1)
+
+def get_original(tree, encoded):
+    """
+    get_original: convert encoded document to original form
+
+    :param tree: root of Huffman tree (Node)
+    :param encoded: encoded representation of text (string)
+    :return: returns original text (string)
+    """
+    decoded = []
+    while(len(encoded) > 0):
+        char, lenght = decode(tree, encoded)
+        encoded = encoded[lenght: ]
+        decoded.append(char)
+
+    return ''.join(decoded)
 
 def reconstruct_tree(encoded):
     """
