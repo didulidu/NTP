@@ -1,5 +1,6 @@
 import time
 import sys
+sys.path.append('../../NTP')
 from util import *
 from huffman import *
 
@@ -24,6 +25,7 @@ def start():
     output_file_name = file_name.replace(".txt", "") + "_compressed_"
     with open(file_name, "r") as reader:
         document = reader.read()
+
     start_time = time.time()
     encoded, tree,  r, encoded_tree = encode_huffman(document)
     save(output_file_name, r, encoded_tree, encoded)

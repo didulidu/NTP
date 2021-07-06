@@ -1,4 +1,8 @@
 import heapq
+import sys
+sys.path.append('../../NTP')
+from util import calculate_time
+
 """
 Huffman coding tree represented with Node class
 For leaf left, right and frequency fields are set to None
@@ -56,7 +60,22 @@ class Node:
             self.left.generate_codes()
             self.right.generate_codes()
 
+@calculate_time
+def get_frequency(string):
+    """
+    calc_frequencies: calculates frequency of every character in given string
 
+    :param string: input text  (string)
+    :return: returns frequency of every char in string (dictionary)
+    """
+    frequency = {}
+    for c in string:
+        if c in frequency.keys():
+            frequency[c] += 1
+        else:
+            frequency[c] = 1
+
+    return frequency
 
 def build_huffman_tree(string):
     """
@@ -66,12 +85,7 @@ def build_huffman_tree(string):
     :param string: input text for compression (string)
     :return: returns root of huffman tree (Node)
     """
-    frequency = {}
-    for c in string:
-        if c in frequency.keys():
-            frequency[c] += 1
-        else:
-            frequency[c] = 1
+    frequency = get_frequency(string)
     heap = []
     for c in frequency.keys():
         root = Node(None, None, c, frequency[c])
