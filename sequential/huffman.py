@@ -91,7 +91,8 @@ def build_huffman_tree(string):
         second_smallest = heapq.heappop(heap)
         root = Node(smallest, second_smallest, None, smallest.frequency + second_smallest.frequency)
         heapq.heappush(heap, root)
-
+        root.display('frequency')
+    
     return heapq.heappop(heap)
 
 

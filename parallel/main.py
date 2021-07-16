@@ -46,6 +46,7 @@ def start():
 
     start_time = time.time()
     encoded, tree,  r, encoded_tree = encode_huffman(document)
+
     save(output_file_name, r, encoded_tree, encoded)
 
     original = get_original(tree, encoded)

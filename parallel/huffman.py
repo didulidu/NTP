@@ -33,6 +33,88 @@ class Node:
         self.frequency = frequency
         self.code = code
 
+    def display(self, nodeString):
+        
+        lines, *_ = self._display_aux(nodeString)
+        for line in lines:
+            print(line)
+
+    def _display_aux(self, nodeString):
+        """Returns list of strings, width, height, and horizontal coordinate of the root."""
+        # No child.
+        other = self.frequency if nodeString == 'frequency' else self.code
+        if self.right is None and self.left is None:
+            value = "{char}-{other}".format(char=self.char, other=other)
+
+            line = '%s' % value
+            width = len(line)
+            height = 1
+            middle = width // 2
+            return [line], width, height, middle
+
+        # Only left child.
+        if self.right is None:
+            lines, n, p, x = self.left._display_aux(nodeString)
+            value = "{char}-{other}".format(char=self.char, other=other)
+            s = '%s' % value
+            u = len(s)
+            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
+            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
+            shifted_lines = [line + u * ' ' for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
+
+        # Only right child.
+        if self.left is None:
+            lines, n, p, x = self.right._display_aux(nodeString)
+            value = "{char}-{other}".format(char=self.char, other=other)
+
+            s = '%s' % value
+            u = len(s)
+            first_line = s + x * '_' + (n - x) * ' '
+            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
+            shifted_lines = [u * ' ' + line for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
+
+        # Two children.
+        left, n, p, x = self.left._display_aux(nodeString)
+        right, m, q, y = self.right._display_aux(nodeString)
+        s = '%s' % other
+        u = len(s)
+        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
+        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
+        if p < q:
+            left += [n * ' '] * (q - p)
+        elif q < p:
+            right += [m * ' '] * (p - q)
+        zipped_lines = zip(left, right)
+        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
+        return lines, n + m + u, max(p, q) + 2, n + u // 2
+
+
+    def __str__(self):
+        left = '*'
+        if (self.left):
+            left = self.left.char
+        right = '*'
+        if (self.right):
+            right = self.right.char
+        
+        return "\n\tLeft: {left} \n\tRight: {right} \n\tData: {char} {code} {freq}\n".format(left=left, right=right, char=self.char, code=self.code, freq=self.frequency)
+        # return self.left + ' ' + self.right + ' ' + self.char + ' ' + self.code + ' ' + self.frequency
+
+    def __repr__(self):
+        left = '*'
+        if (self.left):
+            left = self.left.char
+        right = '*'
+        if (self.right):
+            right = self.right.char
+        
+        return "\n\tLeft: {left} \n\tRight: {right} \n\tData: {char} {code} {freq}\n".format(left=left, right=right, char=self.char, code=self.code, freq=self.frequency)
+
+        # return self.left + ' ' + self.right + ' ' + self.char + ' ' + self.code + ' ' + self.frequency
+ 
+
     def is_leaf(self):
         """
         is_leaf checks if node is has children or no
@@ -61,19 +143,10 @@ class Node:
             self.right.code = self.code + '1'
             self.left.generate_codes()
             self.right.generate_codes()
+            self.display('code')
+            print("\n\n")
 
-# leafs = {}
 
-# def collect_leafs(tree):
-#     if (tree.is_leaf()):
-#         leafs[tree.code] = char
-#         return
-#     with Pool() as pool:
-#         pool.map(collect_leafs, [tree.left, tree.right])
-
-# @calculate_time
-# def collect_leafs_timer(tree):
-#     collect_leafs(tree)
 def chunks(lst, n):
     list =  []
     for i in range(0, len(lst), n):
@@ -140,7 +213,9 @@ def build_huffman_tree(string):
         second_smallest = heapq.heappop(heap)
         root = Node(smallest, second_smallest, None, smallest.frequency + second_smallest.frequency)
         heapq.heappush(heap, root)
-
+        root.display('frequency')
+        print('\n\n')
+  
     return heapq.heappop(heap)
 
 def find_code(tree, c):
