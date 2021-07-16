@@ -4,13 +4,13 @@ sys.path.append('../../NTP')
 from util import *
 from huffman import *
 
+@calculate_time
 def encode_huffman(string):
     tree = build_huffman_tree(string)
     tree.generate_codes()
     encoded_tree =convert_tree_to_bytes(tree)
-    # print("ENCODED TREE: ", encoded_tree)
     r = len(encoded_tree) % 8
-    encoded = encode(string)
+    encoded = encode(string, tree)
 
     return encoded, tree, r, encoded_tree
 
@@ -33,18 +33,13 @@ def start():
 
     original = get_original(tree, encoded)
     # print("DECODED STRING : ", original)
+
     if (original == document):
         print("MATCHES")
     else:
         print("ERROR")
     duration = time.time() - start_time
     print(f"Duration {duration} seconds")
-    # encoded_tree = load_tree_from_file("compressed_" + str(r) + ".bin", r)
-    # print("ENCODED TREE FROM FILE : ", encoded_tree)
-    # reconstructed_tree = reconstruct_tree(encoded_tree)
-    # print_tree(tree)
-    # print()
-    # print_tree(reconstructed_tree)
 
 if __name__ == '__main__':
     start()

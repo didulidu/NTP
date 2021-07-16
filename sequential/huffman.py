@@ -7,12 +7,7 @@ from util import calculate_time
 Huffman coding tree represented with Node class
 For leaf left, right and frequency fields are set to None
 Non leaft nodes have char and frequency fields set to None
-
-Codes are generated after tree is built and saved to global dictionary named codes
 """
-
-codes = {}
-
 class Node:
     def __init__(self, left=None, right=None, char=None, frequency=0, code=''):
         """
@@ -53,7 +48,7 @@ class Node:
         :return: return nothing
         """
         if (self.char):
-            codes[self.char] = self.code
+            return
         else:
             self.left.code = self.code + '0'
             self.right.code = self.code + '1'
@@ -74,9 +69,9 @@ def get_frequency(string):
             frequency[c] += 1
         else:
             frequency[c] = 1
-
     return frequency
 
+@calculate_time
 def build_huffman_tree(string):
     """
     build_huffman_tree creates huffman tree for given string,
@@ -99,7 +94,23 @@ def build_huffman_tree(string):
 
     return heapq.heappop(heap)
 
-def encode(string):
+
+def find_code(tree, c):
+    if (tree.is_leaf()):
+        if(tree.char == c):
+            return tree.code
+        else:
+            return False
+    left =  find_code(tree.left, c) 
+    if (left):
+        return left
+
+    right = find_code(tree.right, c) 
+    if(right):
+        return right
+    
+@calculate_time
+def encode(string, tree):
     """
     encode : encode given string from codes dictionary
 
@@ -108,8 +119,9 @@ def encode(string):
     """
     list = []
     for c in string:
-        list.append(codes[c])
+        list.append(find_code(tree, c))
     return ''.join(list)
+
 
 def decode(tree, encoded, index = 0, length = 0):
     """
@@ -131,6 +143,7 @@ def decode(tree, encoded, index = 0, length = 0):
     elif encoded[index] == '1':
         return decode(tree.right, encoded, index + 1, length + 1)
 
+@calculate_time
 def get_original(tree, encoded):
     """
     get_original: convert encoded document to original form
@@ -147,38 +160,3 @@ def get_original(tree, encoded):
 
     return ''.join(decoded)
 
-def reconstruct_tree(encoded):
-    """
-    reconstruct_tree: rebuild Huffman tree from it's string representation (1 is for leaf node followed by ascii
-    char and 0 is for other nodes)
-
-    :param encoded: string representation of tree (string)
-    :return: returns root of tree (Node)
-    """
-    root = Node()
-    current = root
-    left = True
-    encoded = encoded[1:]
-    # while(len(encoded) > 0):
-    #
-    #     # c = encoded[0]
-    #     # print("KOD ", encoded)
-    #     # if c == '0':
-    #     #     node = Node()
-    #     #     left = True
-    #     #     encoded = encoded[1:]
-    #     # elif c == '1':
-    #     #     char = 'a'
-    #     #     print('tu')
-    #     #     print('karakter', char)
-    #     #     node = Node(None, None, char)
-    #     #     encoded = encoded[8:]
-    #     #     left = False
-    #     # if left:
-    #     #     current.left = node
-    #     #     current = node
-    #     # else:
-    #     #     current.right = node
-    #
-    #
-    # return root

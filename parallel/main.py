@@ -1,18 +1,36 @@
+from multiprocessing import *
 import time
 import sys
 sys.path.append('../../NTP')
 from util import *
 from huffman import *
 
+@calculate_time
+def generate_codes_timer(tree):
+    tree.generate_codes()
+
+@calculate_time
+def convert_tree_to_bytes_timer(tree):
+    return convert_tree_to_bytes(tree)
+
+def chunks(lst, n, tree):
+    list =  []
+    for i in range(0, len(lst), n):
+        list.append((lst[i:i + n], tree))
+    return list
+
+@calculate_time
 def encode_huffman(string):
     tree = build_huffman_tree(string)
-    tree.generate_codes()
-    encoded_tree =convert_tree_to_bytes(tree)
-    # print("ENCODED TREE: ", encoded_tree)
+    generate_codes_timer(tree)
+    encoded_tree = convert_tree_to_bytes_timer(tree)
     r = len(encoded_tree) % 8
-    encoded = encode(string)
-
-    return encoded, tree, r, encoded_tree
+    string_parts = chunks(string, len(string)//cpu_count(), tree)
+ 
+    with Pool() as pool:
+        results = pool.starmap(encode, string_parts)   
+    
+    return ''.join(results), tree, r, encoded_tree
 
 def start():
     if len(sys.argv) == 1:
@@ -29,22 +47,15 @@ def start():
     start_time = time.time()
     encoded, tree,  r, encoded_tree = encode_huffman(document)
     save(output_file_name, r, encoded_tree, encoded)
-    # print("ENCODED STRING : ", encoded)
 
     original = get_original(tree, encoded)
-    # print("DECODED STRING : ", original)
+
     if (original == document):
         print("MATCHES")
     else:
         print("ERROR")
     duration = time.time() - start_time
     print(f"Duration {duration} seconds")
-    # encoded_tree = load_tree_from_file("compressed_" + str(r) + ".bin", r)
-    # print("ENCODED TREE FROM FILE : ", encoded_tree)
-    # reconstructed_tree = reconstruct_tree(encoded_tree)
-    # print_tree(tree)
-    # print()
-    # print_tree(reconstructed_tree)
 
 if __name__ == '__main__':
     start()
