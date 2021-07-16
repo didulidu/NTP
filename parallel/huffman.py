@@ -16,7 +16,7 @@ Codes are generated after tree is built and saved to global dictionary named cod
 """
 
 class Node:
-    def __init__(self, left=None, right=None, char=None, frequency=0, code=''):
+    def __init__(self, left=None, right=None, char=None, frequency=0, code='', level=0):
         """
         Construct a new 'Node' object.
 
@@ -32,6 +32,7 @@ class Node:
         self.char = char
         self.frequency = frequency
         self.code = code
+        self.level = level
 
     def display(self, nodeString):
         
@@ -44,7 +45,7 @@ class Node:
         # No child.
         other = self.frequency if nodeString == 'frequency' else self.code
         if self.right is None and self.left is None:
-            value = "{char}-{other}".format(char=self.char, other=other)
+            value = "{char}-{other}-{level}".format(char=self.char, other=other, level=self.level)
 
             line = '%s' % value
             width = len(line)
@@ -55,7 +56,7 @@ class Node:
         # Only left child.
         if self.right is None:
             lines, n, p, x = self.left._display_aux(nodeString)
-            value = "{char}-{other}".format(char=self.char, other=other)
+            value = "{char}-{other}-{level}".format(char=self.char, other=other, level=self.level)
             s = '%s' % value
             u = len(s)
             first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
@@ -66,7 +67,7 @@ class Node:
         # Only right child.
         if self.left is None:
             lines, n, p, x = self.right._display_aux(nodeString)
-            value = "{char}-{other}".format(char=self.char, other=other)
+            value = "{char}-{other}-{level}".format(char=self.char, other=other, level=self.level)
 
             s = '%s' % value
             u = len(s)
@@ -89,31 +90,6 @@ class Node:
         zipped_lines = zip(left, right)
         lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
         return lines, n + m + u, max(p, q) + 2, n + u // 2
-
-
-    def __str__(self):
-        left = '*'
-        if (self.left):
-            left = self.left.char
-        right = '*'
-        if (self.right):
-            right = self.right.char
-        
-        return "\n\tLeft: {left} \n\tRight: {right} \n\tData: {char} {code} {freq}\n".format(left=left, right=right, char=self.char, code=self.code, freq=self.frequency)
-        # return self.left + ' ' + self.right + ' ' + self.char + ' ' + self.code + ' ' + self.frequency
-
-    def __repr__(self):
-        left = '*'
-        if (self.left):
-            left = self.left.char
-        right = '*'
-        if (self.right):
-            right = self.right.char
-        
-        return "\n\tLeft: {left} \n\tRight: {right} \n\tData: {char} {code} {freq}\n".format(left=left, right=right, char=self.char, code=self.code, freq=self.frequency)
-
-        # return self.left + ' ' + self.right + ' ' + self.char + ' ' + self.code + ' ' + self.frequency
- 
 
     def is_leaf(self):
         """
@@ -207,11 +183,11 @@ def build_huffman_tree(string):
     for c in frequency.keys():
         root = Node(None, None, c, frequency[c])
         heapq.heappush(heap, root)
-
     while len(heap) > 1:
         smallest = heapq.heappop(heap)
         second_smallest = heapq.heappop(heap)
         root = Node(smallest, second_smallest, None, smallest.frequency + second_smallest.frequency)
+        
         heapq.heappush(heap, root)
         root.display('frequency')
         print('\n\n')

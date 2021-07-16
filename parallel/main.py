@@ -1,5 +1,6 @@
 from multiprocessing import *
 import time
+import platform
 import sys
 sys.path.append('../../NTP')
 from util import *
@@ -57,6 +58,7 @@ def start():
         print("ERROR")
     duration = time.time() - start_time
     print(f"Duration {duration} seconds")
+    print("Processor", platform.processor(), "2,6 GHz 6-Core Intel Core i7")
 
 if __name__ == '__main__':
     start()
